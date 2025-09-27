@@ -48,7 +48,7 @@ export default function About() {
       image: piscine,
       items: [
         "Terrasse", "Balcon", "Piscine privée", "Barbecue",
-        "Vue sur la piscine", "Vue sur le jardin", "Mobilier d’extérieur"
+        "Vue sur la piscine", "Vue sur le jardin", "Mobilier d’extérieur","table de ping pong"
       ],
     },
     {
@@ -103,10 +103,15 @@ export default function About() {
 
       {/* Footer */}
       <div className="mt-16 text-center">
+        <p className="text-gray-600 mt-2">
+           une <span className="font-medium">taxe</span> de sejour est à payer au propriétaire 
+        </p>
         <p className="text-gray-600">
           Langues parlées : <span className="font-medium">Français, Anglais</span>
         </p>
-        <p className="mt-2 text-sm text-gray-500">Établissement entièrement non-fumeurs</p>
+        <p>
+          la villa est equipe d'une boite a clé 
+        </p>
       </div>
     </div>
   );

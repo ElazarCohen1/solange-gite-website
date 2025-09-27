@@ -1,10 +1,15 @@
+// faire les disable date 
+// mettre toutes les photo au debut 
+// mettre le prix par nuit et le prix total en fonction du vrai prix d'aujourd'hui et prix total en fonction du nombre de nuit
+
 import React, { useState, useEffect } from "react";
 import { DateRange } from "react-date-range";
 import { addDays, format } from "date-fns";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
-export default function ReservationSearchBar({ onSearch = () => {} }) {
+export default function ReservationSearchBar() {
+
   const [range, setRange] = useState([
     {
       startDate: new Date(),
@@ -13,72 +18,77 @@ export default function ReservationSearchBar({ onSearch = () => {} }) {
     },
   ]);
   const [guests, setGuests] = useState(2);
+  const [mail, setMail] = useState("");
   const [openCalendar, setOpenCalendar] = useState(false);
   const [disabledDates, setDisabledDates] = useState([]);
-  const [allBookings, setAllBookings] = useState([]);
+  const [allPrices, setAllPrices] = useState([
+    {
+      date: new Date(), 
+      price: 120
+    },
+  ]); 
 
   // Fetch toutes les réservations depuis le backend
-  useEffect(() => {
-    fetch("http://localhost:8080/bookings")
-      .then((res) => res.json())
-      .then((data) => {
-        setAllBookings(data);
-
-        // transformer en tableau de dates désactivées
-        const dates = data.bookings.flatMap(({ start, end }) => {
-          const arr = [];
-          let d = new Date(start);
-          const endDate = new Date(end);
-          while (d <= endDate) {
-            arr.push(new Date(d));
-            d.setDate(d.getDate() + 1);
-          }
-          return arr;
-        });
-
-        setDisabledDates(dates);
-      })
-      .catch((err) => console.error("Erreur fetch bookings:", err));
+  useEffect( () => {
+     fetch_price();
   }, []);
 
-  const handleSearch = () => {
-    const booking = {
-      start: range[0].startDate.toISOString().split("T")[0],
-      end: range[0].endDate.toISOString().split("T")[0],
-      guests,
+
+  const clearNameFromEmail = (email) => {
+    const namePart = email.split("@")[0];
+    return namePart.replace(/[^a-zA-Z]/g, '');
+  }
+
+
+  const handleReserve = async () => {
+    const body = {
+      startDate: range[0].startDate,
+      endDate: range[0].endDate,
+      nom: clearNameFromEmail(mail.split("@")[0]),
+      email: mail,
+      nb_personne: guests
     };
-    fetch("http://localhost:8080/bookings", {
+
+    const res = await fetch("http://localhost:8080/reserve", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(booking),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("✅ Réservation ajoutée:", data);
+      body: JSON.stringify(body)
+    });
 
-        // mettre à jour les disabledDates automatiquement
-        const newDates = [];
-        let d = new Date(booking.start);
-        const endDate = new Date(booking.end);
-        while (d <= endDate) {
-          newDates.push(new Date(d));
-          d.setDate(d.getDate() + 1);
-        }
-        setDisabledDates((prev) => [...prev, ...newDates]);
-      })
-      .catch((err) => {
-        console.error("❌ Erreur lors de l'ajout de la réservation:", err, booking);
-      });
+    const data = await res.json();
+    if (data.success) {
+      alert("Réservation réussie !");
+    } else {
+      alert(`Erreur: ${data.message}`);
+    }
   };
 
-  const prettyDate = (d) => format(d, "dd MMM yyyy");
+
+  const fetch_price = () => {
+    fetch("http://localhost:8080/price_and_date")
+    .then((res) => {
+      if (!res.ok) {
+        return res.json().then((data) => {
+          throw new Error(data.message || "Erreur inconnue");
+        });
+      }
+      return res.json();
+    })
+    .then((data) => {
+        setAllPrices(data);
+    }).catch((err)=> {
+      console.log(err);
+    })
+  }
+
+    const prettyDate = (d) => format(d, "dd/MM/yyyy");
 
   return (
     <div className="w-full flex justify-center p-8">
       <div className="w-[90%] bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 flex flex-col md:flex-row gap-8 items-center border border-slate-100">
 
         {/* Left: Dates */}
-        <div className="flex-1 w-full relative">
+        <div className="flex-1 w-full relative ">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-xl font-semibold">Réservez votre séjour</h3>
@@ -87,16 +97,28 @@ export default function ReservationSearchBar({ onSearch = () => {} }) {
               </p>
             </div>
 
-            <button
-              onClick={() => setOpenCalendar((s) => !s)}
-              className="ml-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-300 text-sm hover:bg-slate-50 active:scale-95 transition"
-            >
-              {openCalendar ? "Fermer le calendrier" : "Modifier les dates"}
-            </button>
+            <div className="flex flex-col items-stretch gap-6">
+              <button
+                onClick={() => setOpenCalendar((s) => !s)}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-300 text-sm hover:bg-slate-50 active:scale-95 transition"
+              >
+                {openCalendar ? "Fermer le calendrier" : "Modifier les dates"}
+              </button>
+
+              <input
+                name="mail_reservation"
+                type="text"
+                placeholder="Rentrez votre mail"
+                onChange={(e)=> setMail(e.target.value)}
+                required
+                className="px-4 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+              />
+            </div>
+ 
           </div>
 
           {/* Dates résumées */}
-          <div className="mt-4 flex gap-10">
+          <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-6 bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm">
             <div>
               <p className="text-xs text-slate-400">Arrivée</p>
               <p className="text-base font-medium">{prettyDate(range[0].startDate)}</p>
@@ -104,6 +126,14 @@ export default function ReservationSearchBar({ onSearch = () => {} }) {
             <div>
               <p className="text-xs text-slate-400">Départ</p>
               <p className="text-base font-medium">{prettyDate(range[0].endDate)}</p>
+            </div>
+            <div>
+              <p className="text-xs text-slate-400">Prix par nuit</p>
+              <p className="text-base font-semibold text-sky-600">120 €</p>
+            </div>
+            <div>
+              <p className="text-xs text-slate-400">Prix total</p>
+              <p className="text-base font-semibold text-indigo-600">240 €</p>
             </div>
           </div>
 
@@ -118,6 +148,24 @@ export default function ReservationSearchBar({ onSearch = () => {} }) {
                 direction="horizontal"
                 minDate={new Date()}
                 disabledDates={disabledDates}
+                dayContentRenderer={(date)=>{
+                  const day = date.getDate();
+                  const month = date.getMonth() + 1; 
+                  const year = date.getFullYear();
+                  const key = `${day}/${month}/${year}`;
+                  const prixParJour = allPrices[key] || "—";
+
+                  return(
+                    <div className="flex flex-col items-center justify-center h-full p-1">
+                      <span className="text-sm font-medium block leading-tight">
+                        {date.getDate()}
+                      </span> 
+                      <span className="text-[8px] text-gray-600 block leading-tight mt-1">
+                        {prixParJour}
+                      </span>
+                    </div>
+                  )
+                }}
               />
             </div>
           )}
@@ -149,7 +197,7 @@ export default function ReservationSearchBar({ onSearch = () => {} }) {
             </div>
 
             <button
-              onClick={handleSearch}
+              onClick={handleReserve}
               className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 text-white font-semibold shadow-md hover:scale-[1.01] transition-transform"
             >
               Rechercher

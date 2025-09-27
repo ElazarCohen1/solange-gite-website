@@ -6,8 +6,24 @@ import maison from "../assets/alerces/maison.jpg";
 import piscine from "../assets/alerces/piscine.jpg";
 import chateau from "../assets/alerces/chateau.jpg";
 import salleManger from "../assets/alerces/salle_manger_2.jpg";
+import balcon_barriere from "../assets/alerces/balcon_barriere.jpg";
+import chambre_2 from "../assets/alerces/chambre_2.jpg";
+import chambre from "../assets/alerces/chambre.jpg";
+import cuisine_long_vue from "../assets/alerces/cuisine_long_vue.jpg";
+import cuisine_table from "../assets/alerces/cuisine_table.jpg";
+import cuisine from "../assets/alerces/cuisine.jpg";
+import escalier from "../assets/alerces/escalier.jpg";
+import garage from "../assets/alerces/garage.jpg";
+import jardin from "../assets/alerces/jardin.jpg";
+import pont from "../assets/alerces/pont.jpg";
+import salle_bains_2 from "../assets/alerces/salle_bains_2.jpg";
+import salle_bains_3 from "../assets/alerces/salle_bains_3.jpg";
+import salle_manger_2 from "../assets/alerces/salle_manger_2.jpg";
+import toilette from "../assets/alerces/toilette.jpg";
 
-const images = [maison, piscine, chateau, salleManger];
+
+
+const images = [maison, piscine, chateau, salleManger, balcon_barriere, chambre_2, chambre, cuisine_long_vue, cuisine_table, cuisine, escalier, garage, jardin, pont, salle_bains_2, salle_bains_3, salle_manger_2, toilette];
 
 // Flèche gauche
 const PrevArrow = ({ onClick }) => (
@@ -54,13 +70,13 @@ export default function Carousel() {
     <div className="relative w-[95%] h-[90vh] mx-auto rounded-2xl overflow-hidden shadow-lg">
 
       <div className="absolute inset-0 flex items-center justify-start z-20 px-12">
-        <div className="text-white p-6 rounded-xl max-w-md">
+        <div className="text-[#F5F5DC] p-6 rounded-xl max-w-md">
           
-          <h1 className="text-4xl font-bold mb-4 columns-2">
+          <h1 className="!text-[100px] font-bold mb-4 columns-2">
             Villa D'alerces
           </h1>
 
-          <p className="text-base">
+          <p className="text-xl">
             Profitez d’un cadre unique au cœur de la Vallée de la Loire, entre confort moderne et charme authentique, à deux pas des plus beaux châteaux
           </p>
         </div>
@@ -73,7 +89,7 @@ export default function Carousel() {
             <img
               src={src}
               alt={`Slide ${index}`}
-              className="w-full h-screen object-cover"
+              className="w-full h-screen object-cover "
             />
           </div>
         ))}

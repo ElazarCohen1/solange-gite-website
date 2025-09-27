@@ -21,7 +21,7 @@ function App() {
         <div className='space-y-6 '>
           <section id='presentation' className='section scroll-mt-10 mt-2'>
             <Presentation />
-            <ReservationSearchBar onSearch={(payload) => console.log(payload)} />
+            <ReservationSearchBar  />
           </section>
           
           <section id='about' className='section scroll-mt-10'>
