@@ -1,10 +1,10 @@
-// faire les disable date 
-// mettre toutes les photo au debut 
-// mettre le prix par nuit et le prix total en fonction du vrai prix d'aujourd'hui et prix total en fonction du nombre de nuit
+// bloquer les reservations deja prise avec la fonction isoverlapping the server_tmp 
+// envoyer le mail de confirmation et pouvoir annuler la reservation
+// afficher le prix total dans la reservation bar 
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import { DateRange } from "react-date-range";
-import { addDays, format } from "date-fns";
+import { addDays, format, set } from "date-fns";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
@@ -32,7 +32,37 @@ export default function ReservationSearchBar() {
   useEffect( () => {
      fetch_price();
   }, []);
+    
+  useEffect( () => {
+      get_disables_dates();
+  }, []);
+  
+  const get_disables_dates = async () => {
+      fetch("http://localhost:8080/disable_dates")
+      .then(async (res) => {
+        if (!res.ok) {
+          return res.json().then((data) => {
+            throw new Error(data.message || "Erreur inconnue");
+          });
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if(data.success){
+          const dates = data.data.map((d) => {
+            const [day, month, year] = d.split("/").map(Number);
+            return new Date(`${year}-${month}-${day}`);
+          }
+          );
+          setDisabledDates(dates);
+        }
+      })
+      .catch((err)=> {
+        console.log(err);
+      })
 
+      
+  }
 
   const clearNameFromEmail = (email) => {
     const namePart = email.split("@")[0];
