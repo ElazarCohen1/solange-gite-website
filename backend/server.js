@@ -116,6 +116,23 @@ app.post("/reserve", async (req, res) => {
   }
 });
 
+app.get("/disable_dates",async (req,res) => {
+  try{
+      
+      const sheet = await getSheet("Feuil1!A:C");
+      // enlever l'en tete 
+      const data = sheet.slice(1);
+      const disables_lines = data.filter((row) => row[2].toLowerCase() === "non");
+      const disables_dates = disables_lines.map((row) =>  row[0]);
+      console.log(disables_dates);
+      res.json({success: true, message: "disable_dates", data: disables_dates});
+    
+    }catch(err){
+    	console.log(err);
+	    res.status(500).send("erreur lors de la recuperation des disables dates");
+    }
+
+});
 
 app.listen(8080, () => {
   console.log("server running on http://localhost:8080");

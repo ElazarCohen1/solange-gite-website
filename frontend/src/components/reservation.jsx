@@ -1,10 +1,10 @@
-// faire les disable date 
-// mettre toutes les photo au debut 
-// mettre le prix par nuit et le prix total en fonction du vrai prix d'aujourd'hui et prix total en fonction du nombre de nuit
+// bloquer les reservations deja prise avec la fonction isoverlapping the server_tmp 
+// envoyer le mail de confirmation et pouvoir annuler la reservation
+// afficher le prix total dans la reservation bar 
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import { DateRange } from "react-date-range";
-import { addDays, format } from "date-fns";
+import { addDays, format, set,startOfMonth, endOfMonth, addMonths } from "date-fns";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
@@ -17,6 +17,7 @@ export default function ReservationSearchBar() {
       key: "selection",
     },
   ]);
+
   const [guests, setGuests] = useState(2);
   const [mail, setMail] = useState("");
   const [openCalendar, setOpenCalendar] = useState(false);
@@ -28,11 +29,39 @@ export default function ReservationSearchBar() {
     },
   ]); 
 
-  // Fetch toutes les réservations depuis le backend
   useEffect( () => {
      fetch_price();
   }, []);
+    
+  useEffect( () => {
+      get_disables_dates();
+  }, []);
+  
 
+  const get_disables_dates = async () => {
+    try {
+      const url = new URL("http://localhost:8080/disable_dates");
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Erreur inconnue");
+      }
+
+      const data = await response.json();
+      console.log("Réponse reçue pour les dates désactivées :", data);
+      if (data.success) {
+        const dates = data.data.map((dateStr) => {
+          const [day, month, year] = dateStr.split('/').map(Number);
+          const d = new Date(year, month - 1, day);
+          return isNaN(d) ? null : d;
+        })
+        setDisabledDates(dates);
+      }
+    } catch (err) {
+      console.log("Erreur lors de la récupération des dates désactivées :", err);
+    }
+};
 
   const clearNameFromEmail = (email) => {
     const namePart = email.split("@")[0];
@@ -81,7 +110,21 @@ export default function ReservationSearchBar() {
     })
   }
 
-    const prettyDate = (d) => format(d, "dd/MM/yyyy");
+  const priceByNight = ()=>{
+    const date = range[0].startDate;
+    const day = date.getDate();
+    const month = date.getMonth() + 1; 
+    const year = date.getFullYear();
+    const key = `${day}/${month}/${year}`;
+    return allPrices[key] || "—";
+  }
+  const totalPrice = ()=>{
+    const total = 0;
+    const ecart = Math.ceil((range[0].endDate - range[0].startDate) / (1000 * 60 * 60 * 24));
+    console.log(ecart);
+  }
+  
+  const prettyDate = (d) => format(d, "dd/MM/yyyy");
 
   return (
     <div className="w-full flex justify-center p-8">
@@ -121,19 +164,19 @@ export default function ReservationSearchBar() {
           <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-6 bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm">
             <div>
               <p className="text-xs text-slate-400">Arrivée</p>
-              <p className="text-base font-medium">{prettyDate(range[0].startDate)}</p>
+              <p className="text-base font-medium">{prettyDate(range.startDate)}</p>
             </div>
             <div>
               <p className="text-xs text-slate-400">Départ</p>
-              <p className="text-base font-medium">{prettyDate(range[0].endDate)}</p>
+              <p className="text-base font-medium">{prettyDate(range.endDate)}</p>
             </div>
             <div>
-              <p className="text-xs text-slate-400">Prix par nuit</p>
-              <p className="text-base font-semibold text-sky-600">120 €</p>
+              <p className="text-xs text-slate-400">Prix par nuit </p>
+              <p className="text-base font-semibold text-sky-600">{priceByNight()}</p>
             </div>
             <div>
               <p className="text-xs text-slate-400">Prix total</p>
-              <p className="text-base font-semibold text-indigo-600">240 €</p>
+              <p className="text-base font-semibold text-indigo-600">{totalPrice()}</p>
             </div>
           </div>
 
@@ -141,7 +184,7 @@ export default function ReservationSearchBar() {
           {openCalendar && (
             <div className="absolute top-full left-0 mt-2 bg-white p-4 rounded-xl border border-slate-200 shadow-lg z-50 transition-all duration-300 ease-in-out">
               <DateRange
-                onChange={(item) => setRange([item.selection])}
+                onChange={(item) => setRange(item.selection)}
                 moveRangeOnFirstSelection={false}
                 ranges={range}
                 months={2}
