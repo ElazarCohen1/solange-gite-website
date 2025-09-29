@@ -4,7 +4,7 @@
 
 import React, { useState, useEffect, use } from "react";
 import { DateRange } from "react-date-range";
-import { addDays, format, set } from "date-fns";
+import { addDays, format, set,startOfMonth, endOfMonth, addMonths } from "date-fns";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
@@ -17,6 +17,7 @@ export default function ReservationSearchBar() {
       key: "selection",
     },
   ]);
+
   const [guests, setGuests] = useState(2);
   const [mail, setMail] = useState("");
   const [openCalendar, setOpenCalendar] = useState(false);
@@ -28,7 +29,6 @@ export default function ReservationSearchBar() {
     },
   ]); 
 
-  // Fetch toutes les réservations depuis le backend
   useEffect( () => {
      fetch_price();
   }, []);
@@ -37,32 +37,31 @@ export default function ReservationSearchBar() {
       get_disables_dates();
   }, []);
   
-  const get_disables_dates = async () => {
-      fetch("http://localhost:8080/disable_dates")
-      .then(async (res) => {
-        if (!res.ok) {
-          return res.json().then((data) => {
-            throw new Error(data.message || "Erreur inconnue");
-          });
-        }
-        return res.json();
-      })
-      .then((data) => {
-        if(data.success){
-          const dates = data.data.map((d) => {
-            const [day, month, year] = d.split("/").map(Number);
-            return new Date(`${year}-${month}-${day}`);
-          }
-          );
-          setDisabledDates(dates);
-        }
-      })
-      .catch((err)=> {
-        console.log(err);
-      })
 
+  const get_disables_dates = async () => {
+    try {
+      const url = new URL("http://localhost:8080/disable_dates");
+      const response = await fetch(url);
       
-  }
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Erreur inconnue");
+      }
+
+      const data = await response.json();
+      console.log("Réponse reçue pour les dates désactivées :", data);
+      if (data.success) {
+        const dates = data.data.map((dateStr) => {
+          const [day, month, year] = dateStr.split('/').map(Number);
+          const d = new Date(year, month - 1, day);
+          return isNaN(d) ? null : d;
+        })
+        setDisabledDates(dates);
+      }
+    } catch (err) {
+      console.log("Erreur lors de la récupération des dates désactivées :", err);
+    }
+};
 
   const clearNameFromEmail = (email) => {
     const namePart = email.split("@")[0];
@@ -111,7 +110,26 @@ export default function ReservationSearchBar() {
     })
   }
 
-    const prettyDate = (d) => format(d, "dd/MM/yyyy");
+  const priceByNight = ()=>{
+    const date = range[0].startDate;
+    const day = date.getDate();
+    const month = date.getMonth() + 1; 
+    const year = date.getFullYear();
+    const key = `${day}/${month}/${year}`;
+    return allPrices[key] || "—";
+  }
+  const totalPrice = ()=>{
+    const ecart = Math.ceil((range[0].endDate - range[0].startDate) / (1000 * 60 * 60 * 24));
+    let total = 0;
+    for (let i=0; i < ecart; i++){
+      const date = prettyDate(addDays(range[0].startDate, i));  
+      console.log(date, allPrices[date]);
+      total += parseInt(allPrices[date]) || 0;
+    }
+    return total;
+  }
+  
+  const prettyDate = (d) => format(d, "dd/M/yyyy");
 
   return (
     <div className="w-full flex justify-center p-8">
@@ -158,12 +176,12 @@ export default function ReservationSearchBar() {
               <p className="text-base font-medium">{prettyDate(range[0].endDate)}</p>
             </div>
             <div>
-              <p className="text-xs text-slate-400">Prix par nuit</p>
-              <p className="text-base font-semibold text-sky-600">120 €</p>
+              <p className="text-xs text-slate-400">Prix par nuit </p>
+              <p className="text-base font-semibold text-sky-600">{priceByNight()}</p>
             </div>
             <div>
               <p className="text-xs text-slate-400">Prix total</p>
-              <p className="text-base font-semibold text-indigo-600">240 €</p>
+              <p className="text-base font-semibold text-indigo-600">{totalPrice()}€</p>
             </div>
           </div>
 
