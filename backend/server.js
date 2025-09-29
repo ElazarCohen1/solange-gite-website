@@ -33,19 +33,6 @@ async function getSheet(range) {
   return res.data.values; 
 }
 
-app.get("/", async (req, res) => {
-  try {
-    const getFeuil1 = await getSheet("Feuil1!A:B");
-    const getPrixSaisons = await getSheet("PrixSaisons");
-
-    // res.json(getFeuil1); 
-
-  } catch (error) {
-    console.error("Erreur :", error);
-    res.status(500).send("Erreur lors de l'accès au Google Sheet");
-  }
-});
-
 app.get("/price_and_date",async (req,res)=>{
   try{
       const getFeuil1 = await getSheet("Feuil1!A:B");
@@ -136,4 +123,4 @@ app.get("/disable_dates",async (req,res) => {
 
 app.listen(8080, () => {
   console.log("server running on http://localhost:8080");
-});
+});	

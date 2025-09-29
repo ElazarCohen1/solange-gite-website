@@ -119,12 +119,17 @@ export default function ReservationSearchBar() {
     return allPrices[key] || "—";
   }
   const totalPrice = ()=>{
-    const total = 0;
     const ecart = Math.ceil((range[0].endDate - range[0].startDate) / (1000 * 60 * 60 * 24));
-    console.log(ecart);
+    let total = 0;
+    for (let i=0; i < ecart; i++){
+      const date = prettyDate(addDays(range[0].startDate, i));  
+      console.log(date, allPrices[date]);
+      total += parseInt(allPrices[date]) || 0;
+    }
+    return total;
   }
   
-  const prettyDate = (d) => format(d, "dd/MM/yyyy");
+  const prettyDate = (d) => format(d, "dd/M/yyyy");
 
   return (
     <div className="w-full flex justify-center p-8">
@@ -176,7 +181,7 @@ export default function ReservationSearchBar() {
             </div>
             <div>
               <p className="text-xs text-slate-400">Prix total</p>
-              <p className="text-base font-semibold text-indigo-600">{totalPrice()}</p>
+              <p className="text-base font-semibold text-indigo-600">{totalPrice()}€</p>
             </div>
           </div>
 
