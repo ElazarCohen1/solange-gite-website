@@ -1,5 +1,3 @@
-// afficher le prix total dans la reservation bar 
-// prix total 
 // dernier jour de la reservation non compté
 // bien afficher les utilitaires qui se retracte 
 // contact avec le backend et pas mailfrontend
@@ -11,6 +9,7 @@ import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
 export default function ReservationSearchBar() {
+  const [priceTotal, setpriceTotal] = useState(0);
 
   const [range, setRange] = useState([
     {
@@ -19,7 +18,6 @@ export default function ReservationSearchBar() {
       key: "selection",
     },
   ]);
-
   const [guests, setGuests] = useState(2);
   const [mail, setMail] = useState("");
   const [openCalendar, setOpenCalendar] = useState(false);
@@ -32,13 +30,19 @@ export default function ReservationSearchBar() {
   ]); 
 
   useEffect( () => {
-     fetch_price();
+    fetch_price();
+    get_disables_dates();
+
   }, []);
     
-  useEffect( () => {
-      get_disables_dates();
-  }, []);
-  
+ 
+  const formatDateKey = (date) => {
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
   const get_disables_dates = async () => {
     try {
       const url = new URL("http://localhost:8080/disable_dates");
@@ -50,7 +54,6 @@ export default function ReservationSearchBar() {
       }
 
       const data = await response.json();
-      console.log("Réponse reçue pour les dates désactivées :", data);
       if (data.success) {
         const dates = data.data.map((dateStr) => {
           const [day, month, year] = dateStr.split('/').map(Number);
@@ -87,6 +90,7 @@ export default function ReservationSearchBar() {
       email: mail,
       nb_personne: guests
     };
+    console.log(body);
     if (!ValideBooking(range[0])){
       alert("Certaines dates dans votre sélection sont déjà réservées. Veuillez choisir d'autres dates.");
       return;
@@ -137,24 +141,31 @@ export default function ReservationSearchBar() {
     })
   }
 
-  const priceByNight = ()=>{
+  const priceByNight = () => {
     const date = range[0].startDate;
-    const day = date.getDate();
-    const month = date.getMonth() + 1; 
-    const year = date.getFullYear();
-    const key = `${day}/${month}/${year}`;
+    const key = formatDateKey(date);
     return allPrices[key] || "—";
-  }
+  };
   const totalPrice = ()=>{
-    const ecart = Math.ceil((range[0].endDate - range[0].startDate) / (1000 * 60 * 60 * 24));
+    const start = new Date(range[0].startDate);
+    const end = new Date(range[0].endDate);
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+    const ecart = Math.round((end - start) / (1000*60*60*24)) + 1;
+
     let total = 0;
-    for (let i=0; i < ecart; i++){
-      const date = prettyDate(addDays(range[0].startDate, i));  
-      console.log(date, allPrices[date]);
+    for (let i = 1; i <= ecart; i++){
+      const date = formatDateKey(addDays(range[0].startDate, i));  
       total += parseInt(allPrices[date]) || 0;
     }
     return total;
   }
+   useEffect(() => {
+    if (Object.keys(allPrices).length > 0 && range[0].startDate && range[0].endDate) {
+      const total = totalPrice();
+      setpriceTotal(total);
+    }
+  }, [range, allPrices]);
   
   const prettyDate = (d) => format(d, "dd/M/yyyy");
 
@@ -208,7 +219,7 @@ export default function ReservationSearchBar() {
             </div>
             <div>
               <p className="text-xs text-slate-400">Prix total</p>
-              <p className="text-base font-semibold text-indigo-600">{totalPrice()}€</p>
+                <p className="text-base font-semibold text-indigo-600">{priceTotal}€</p>
             </div>
           </div>
 

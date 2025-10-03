@@ -97,25 +97,36 @@ async function updateSheet(range, values) {
 
 
 app.post("/reserve", async (req, res) => {
+  const formatDateForEmail = (dateString) => {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('fr-FR', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    };
   try {
+    
+
     const { startDate, endDate, nom, email,nb_personne } = req.body;
     // récupération de la feuille
     const rows = await getSheet("Feuil1!A:F"); // A=Date, B=Prix, C=Dispo, D=Nom, E=Email F=nb_personne
-
-    
     // formater en Date pour comparer
     const start = new Date(startDate);
     const end = new Date(endDate);
-
+    const startFormatted = formatDateForEmail(startDate);
+    const endFormatted = formatDateForEmail(endDate);
     // on prépare les updates
     const updates = [];
     rows.forEach((row, i) => {
       if (i === 0) return; 
       const [date, prix, dispo] = row;
       const [day, month, year] = date.split("/");
-      const rowDate = new Date(`${year}-${month}-${day}`);
+      const rowDate = new Date(`${year}-${month.padStart(2,'0')}-${day}`);
       // console.log(`Comparaison des dates : ${rowDate} avec ${start} - ${end}`);
       if (rowDate >= start && rowDate <= end) {
+        console.log(`Traitement de la date : ${date} (dispo: ${dispo})`);
         updates.push({
           range: `Feuil1!C${i + 1}:F${i + 1}`, // colonnes C à F de la ligne
           values: [["Non", nom, email,nb_personne]]
@@ -136,13 +147,13 @@ app.post("/reserve", async (req, res) => {
         await sendEmail(
         email,
         "confirmation de réservation",
-        `Bonjour ${nom},\n\nVotre réservation du ${startDate} au ${endDate} pour ${nb_personne} personnes a été confirmée.
+        `Bonjour ${nom},\n\nVotre réservation du ${startFormatted} au ${endFormatted} pour ${nb_personne} personnes a été confirmée.
         Si vous voulez annulez appuyer sur ce lien : http://localhost:8080/cancel_reservation 
         \n\nMerci!`,
         `
         <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
           <p>Bonjour <b>${nom}</b>,</p>
-          <p>Votre réservation du <b>${startDate}</b> au <b>${endDate}</b> pour <b>${nb_personne} personnes</b> a été confirmée.</p>
+          <p>Votre réservation du <b>${startFormatted}</b> au <b>${endFormatted}</b> pour <b>${nb_personne} personnes</b> a été confirmée.</p>
           <p>Si vous souhaitez annuler votre réservation, cliquez sur le bouton ci-dessous :</p>
           <a href="http://localhost:5173/cancel?start=${startDate}&end=${endDate}&email=${email}" 
             style="display:inline-block;padding:10px 20px;margin:10px 0;background:#d9534f;color:#fff;
