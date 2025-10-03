@@ -1,6 +1,8 @@
-// bloquer les reservations deja prise avec la fonction isoverlapping the server_tmp 
-// envoyer le mail de confirmation et pouvoir annuler la reservation
 // afficher le prix total dans la reservation bar 
+// prix total 
+// dernier jour de la reservation non compté
+// bien afficher les utilitaires qui se retracte 
+// contact avec le backend et pas mailfrontend
 
 import React, { useState, useEffect, use } from "react";
 import { DateRange } from "react-date-range";
@@ -37,7 +39,6 @@ export default function ReservationSearchBar() {
       get_disables_dates();
   }, []);
   
-
   const get_disables_dates = async () => {
     try {
       const url = new URL("http://localhost:8080/disable_dates");
@@ -61,7 +62,16 @@ export default function ReservationSearchBar() {
     } catch (err) {
       console.log("Erreur lors de la récupération des dates désactivées :", err);
     }
-};
+  };  
+  const ValideBooking = (range_of_date) => {
+    // range_of_date doit avoir startDate, endDate
+    for(let d of disabledDates){
+      if (d >= range_of_date.startDate && d <= range_of_date.endDate){
+        return false;
+      }
+    }
+    return true;
+  }
 
   const clearNameFromEmail = (email) => {
     const namePart = email.split("@")[0];
@@ -77,6 +87,23 @@ export default function ReservationSearchBar() {
       email: mail,
       nb_personne: guests
     };
+    if (!ValideBooking(range[0])){
+      alert("Certaines dates dans votre sélection sont déjà réservées. Veuillez choisir d'autres dates.");
+      return;
+    }
+
+    if (!mail || !mail.includes("@")){
+      alert("Veuillez entrer un email valide pour la réservation.");
+      return;
+    }
+    if (body.nb_personne < 1 || body.nb_personne > 12){
+      alert("Le nombre de voyageurs doit être compris entre 1 et 12.");
+      return;
+    }
+    if (body.startDate > body.endDate){
+      alert("La date de départ doit être après la date d'arrivée.");
+      return;
+    }
 
     const res = await fetch("http://localhost:8080/reserve", {
       method: "POST",
@@ -86,7 +113,7 @@ export default function ReservationSearchBar() {
 
     const data = await res.json();
     if (data.success) {
-      alert("Réservation réussie !");
+      alert("Réservation réussie ! \nverifier votre mail pour la confirmation.Si vous ne voyez pas le mail, contactez le proprietaire.");
     } else {
       alert(`Erreur: ${data.message}`);
     }
@@ -152,7 +179,7 @@ export default function ReservationSearchBar() {
               >
                 {openCalendar ? "Fermer le calendrier" : "Modifier les dates"}
               </button>
-
+              {/* le mail */}
               <input
                 name="mail_reservation"
                 type="text"
@@ -168,12 +195,12 @@ export default function ReservationSearchBar() {
           {/* Dates résumées */}
           <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-6 bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm">
             <div>
-              <p className="text-xs text-slate-400">Arrivée</p>
-              <p className="text-base font-medium">{prettyDate(range.startDate)}</p>
+              <p className="text-xs text-slate-400">Arrivée(exlus)</p>
+              <p className="text-base font-medium">{prettyDate(range[0].startDate)}</p>
             </div>
             <div>
-              <p className="text-xs text-slate-400">Départ</p>
-              <p className="text-base font-medium">{prettyDate(range.endDate)}</p>
+              <p className="text-xs text-slate-400">Départ(inclus)</p>
+              <p className="text-base font-medium">{prettyDate(range[0].endDate)}</p>
             </div>
             <div>
               <p className="text-xs text-slate-400">Prix par nuit </p>
@@ -189,7 +216,7 @@ export default function ReservationSearchBar() {
           {openCalendar && (
             <div className="absolute top-full left-0 mt-2 bg-white p-4 rounded-xl border border-slate-200 shadow-lg z-50 transition-all duration-300 ease-in-out">
               <DateRange
-                onChange={(item) => setRange(item.selection)}
+                onChange={(item) => setRange([item.selection])}
                 moveRangeOnFirstSelection={false}
                 ranges={range}
                 months={2}

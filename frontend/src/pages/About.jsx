@@ -58,11 +58,7 @@ export default function About() {
         "Jeux de société", "DVD / Musique pour enfants", "Barrières de sécurité bébé"
       ],
     },
-    {
-      title: "Sécurité",
-      image: security,
-      items: ["Détecteur de monoxyde de carbone"],
-    },
+    
   ];
 
   return (

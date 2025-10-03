@@ -1,0 +1,13 @@
+{
+    "developpement":
+    {
+        "backend_url":"http://localhost:8080",
+        "frontend_url":"http://localhost:5173"
+    },
+    "production":
+    {
+        "backend_url":"https://solange-gite-backend.onrender.com",
+        "frontend_url":"https://solange-gite-website.vercel.app"
+    }
+    
+}
