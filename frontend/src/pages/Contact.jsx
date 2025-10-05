@@ -1,28 +1,34 @@
-import React from "react";
-import emailjs from "emailjs-com";
 import { Mail, User, MessageSquare } from "lucide-react";
 
 function Contact() {
-  function sendEmail(e) {
+
+  async function sendEmail(e) {
     e.preventDefault();
-
-    emailjs
-      .sendForm(
-        "service_b18m2kl", // ⚠️ ton service ID
-        "template_v7qcr4g", // ⚠️ ton template ID
-        e.target,
-        "WmlYF4YJCU6yWSCGT" // ⚠️ ton public key
-      )
-      .then(
-        () => {
-          alert("✅ Message envoyé avec succès ! Merci de nous avoir contactés.");
-        },
-        (error) => {
-          alert("❌ Erreur lors de l’envoi : " + error.text);
-        }
-      );
-
-    e.target.reset();
+    console.log("Envoi du message...");
+    await fetch("http://localhost:8080/send_contact_email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        nom: e.target.name.value,
+        email: e.target.email.value,
+        message: e.target.message.value,
+      }),
+    })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.success) { 
+        alert("Message envoyé avec succès !");
+        e.target.reset();
+      } else {
+        alert("Erreur lors de l'envoi du message. Veuillez réessayer.");
+      }
+    })
+    .catch((err) => {
+      console.error("Erreur lors de l'envoi :", err);
+      alert("Erreur lors de l'envoi du message. Veuillez réessayer.");
+    });
   }
 
   return (

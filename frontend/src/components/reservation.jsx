@@ -1,6 +1,4 @@
-// dernier jour de la reservation non compté
 // bien afficher les utilitaires qui se retracte 
-// contact avec le backend et pas mailfrontend
 
 import React, { useState, useEffect, use } from "react";
 import { DateRange } from "react-date-range";

@@ -5,9 +5,9 @@ function EquipmentSection({ title, items, image }) {
   <div className="h-[300px] flex flex-col md:flex-row gap-6 group relative overflow-hidden rounded-xl shadow-md border bg-white">
   
     {/* Liste */}
-    <div className="flex-1 p-6 transition-all duration-500 ease-in group-hover:md:w-1/4">
+    <div className="flex-1 p-6 transition-all duration-500 ease-in group-hover:md:w-1/4 ">
       <h2 className="text-xl font-semibold mb-4">{title}</h2>
-      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 ">
         {items.map((it, i) => (
           <li key={i} className="flex items-center gap-2 text-gray-700">
             <CheckCircle className="w-4 h-4 text-green-500" /> {it}

@@ -123,9 +123,10 @@ app.post("/reserve", async (req, res) => {
       if (i === 0) return; 
       const [date, prix, dispo] = row;
       const [day, month, year] = date.split("/");
-      const rowDate = new Date(`${year}-${month.padStart(2,'0')}-${day}`);
+      const rowDate = new Date(`${year}-${month}-${day}`);
       // console.log(`Comparaison des dates : ${rowDate} avec ${start} - ${end}`);
-      if (rowDate >= start && rowDate <= end) {
+      const endPlusOne = new Date(end.getTime() + 24 * 60 * 60 * 1000);
+      if (rowDate >= start && rowDate <= endPlusOne) {
         console.log(`Traitement de la date : ${date} (dispo: ${dispo})`);
         updates.push({
           range: `Feuil1!C${i + 1}:F${i + 1}`, // colonnes C à F de la ligne
@@ -133,7 +134,6 @@ app.post("/reserve", async (req, res) => {
         });
       }
     });
-    // on verifie que c'est pas deja reservé 
     // on update 
     for (let u of updates) {
       try {
@@ -238,6 +238,54 @@ app.post("/cancel_reservation", async (req, res) => {
     console.error("Erreur lors de l'annulation :", err);
     res.status(500).send("Erreur lors de l'annulation de la réservation");
   }
+});
+
+app.post("/send_contact_email", async (req, res) => {
+  const { nom, email, message } = req.body;
+  try{
+    await sendEmail(
+    email,
+    "Confirmation de réception de votre message",
+    `Bonjour ${nom},\n\nNous avons bien reçu votre message :\n"${message}"\n\nNous vous répondrons dans les plus brefs délais.\n\nMerci!`
+    ,
+    `
+    <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
+      <p>Bonjour <b>${nom}</b>,</p>
+      <p>Nous avons bien reçu votre message :</p>
+      <blockquote style="border-left: 4px solid #ccc; margin: 10px 0; padding-left: 10px; color: #555;">
+        "${message}"
+      </blockquote> 
+      <p>Nous vous répondrons dans les plus brefs délais.</p>
+      <p>Merci !</p>
+    </div>
+    `
+   );
+  }catch(err){
+    console.error("Erreur lors de l'envoi de l'email au client :", err);
+  }
+
+  try{
+    await sendEmail(
+    "elazarcohen01@gmail.com",
+    "Nouveau message de contact",
+    `Vous avez reçu un nouveau message de ${nom} (${email}) :\n\n"${message}"`
+    ,
+    `
+    <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
+      <p>Vous avez reçu un nouveau message de <b>${nom}</b> (<a href="mailto:${email}">${email}</a>) :</p>
+      <blockquote style="border-left: 4px solid #ccc; margin: 10px 0; padding-left: 10px; color: #555;">
+        "${message}"
+      </blockquote>
+    </div>
+    `
+    );
+  }catch(err){
+    console.error("Erreur lors de l'envoi de l'email au proprietaire :", err);
+    return res.status(500).send("Erreur lors de l'envoi du message");
+  }
+
+  res.json({ success: true, message: "Email de contact envoyé !" });
+    
 });
 
 
