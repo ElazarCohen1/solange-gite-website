@@ -222,7 +222,7 @@ export default function ReservationSearchBar() {
             </div>
             <div>
               <p className="text-xs text-slate-400">Prix par nuit </p>
-              <p className="text-base font-semibold text-sky-600">{priceByNight()}</p>
+              <p className="text-base font-semibold text-sky-600">{priceByNight()} €</p>
             </div>
             <div>
               <p className="text-xs text-slate-400">Prix total</p>

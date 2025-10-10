@@ -17,7 +17,7 @@ function EquipmentSection({ title, items, image }) {
     </div>
 
     {/* Image */}
-    <div className="w-full md:w-1/3 transition-all duration-500 ease-in group-hover:md:w-3/4 overflow-hidden">
+    <div className="w-full md:w-1/3 transition-all duration-500 ease-in group-hover:md:w-3/4 overflow-hidden hidden md:block">
       <img
         src={image}
         alt={title}

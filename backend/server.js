@@ -168,6 +168,8 @@ app.post("/reserve", async (req, res) => {
         <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
           <p>Bonjour <b>${nom}</b>,</p>
           <p>Votre réservation du <b>${startFormatted}</b> au <b>${endFormatted}</b> pour <b>${nb_personne} personnes</b> a été confirmée.</p>
+          <p> <b>Rappel : <b/> la taxe de sejour par personne sera a payer au propriétaire (Voir les informations sur le site)<p/>
+
           <p>Si vous souhaitez annuler votre réservation, cliquez sur le bouton ci-dessous :</p>
           <a href="http://localhost:5173/cancel?start=${startDate}&end=${endPlusOne}&email=${email}" 
             style="display:inline-block;padding:10px 20px;margin:10px 0;background:#d9534f;color:#fff;
