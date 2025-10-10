@@ -2,10 +2,6 @@
   "dependencies": {
     "ejs": "^3.1.10",
     "googleapis": "^160.0.0"
-  },
-  "homepage": "https://Elazarcohen1.github.io/solange-gite-website",
-  "scripts": {
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
   }
+  
 }
