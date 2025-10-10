@@ -7,6 +7,8 @@ import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
 export default function ReservationSearchBar() {
+  // for the reservation button
+  const [loading, setLoading] = useState(false);
   const [priceTotal, setpriceTotal] = useState(0);
 
   const [range, setRange] = useState([
@@ -106,19 +108,26 @@ export default function ReservationSearchBar() {
       alert("La date de départ doit être après la date d'arrivée.");
       return;
     }
-
-    const res = await fetch("http://localhost:8080/reserve", {
+    try{
+      setLoading(true);
+      const res = await fetch("http://localhost:8080/reserve", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body)
-    });
+      });
 
-    const data = await res.json();
-    if (data.success) {
-      alert("Réservation réussie ! \nverifier votre mail pour la confirmation.Si vous ne voyez pas le mail, contactez le proprietaire.");
-    } else {
-      alert(`Erreur: ${data.message}`);
+      const data = await res.json();
+      if (data.success) {
+        alert("Réservation réussie ! \nverifier votre mail pour la confirmation.Si vous ne voyez pas le mail, contactez le proprietaire.");
+      } else {
+        alert(`Erreur: ${data.message}`);
+      }
+    }catch(err){
+      alert(`Erreur lors de la réservation: ${err.message}`);
+    }finally{
+      setLoading(false);
     }
+    
   };
 
 
@@ -284,7 +293,11 @@ export default function ReservationSearchBar() {
               onClick={handleReserve}
               className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 text-white font-semibold shadow-md hover:scale-[1.01] transition-transform"
             >
-              Rechercher
+              {!loading ? ( 
+                  <span>Réserver</span>
+
+              ): <span>⏳ Reservation en cours...</span>
+              }
             </button>
 
             <p className="text-center text-xs text-slate-500">

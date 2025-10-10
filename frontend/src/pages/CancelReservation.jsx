@@ -11,6 +11,15 @@ export default function CancelReservation() {
   const start = searchParams.get("start");
   const end = searchParams.get("end");
   const email = searchParams.get("email");
+  const formatDateForEmail = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('fr-FR', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
 
   const handleCancel = async () => {
     setLoading(true);
@@ -23,6 +32,7 @@ export default function CancelReservation() {
 
       const data = await res.json();
       if (data.success) {
+        console.log("Réservation annulée avec succès.");
         setCanceled(true);
       } else {
         setCanceled(false);
@@ -55,7 +65,7 @@ export default function CancelReservation() {
       {!canceled ? (
         <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-md text-center">
           <h2 className="text-2xl font-bold mb-4">Annuler ma réservation</h2>
-          <p className="mb-2">📅 Du <b>{start}</b> au <b>{end}</b></p>
+          <p className="mb-2">📅 Du <b>{formatDateForEmail(start)}</b> au <b>{formatDateForEmail(end)}</b></p>
           <p className="mb-6">👤 Réservation faite avec : <b>{email}</b></p>
 
           {!loading ? (
@@ -84,7 +94,7 @@ export default function CancelReservation() {
         </div>
       ) : canceled ? (
         <div className="bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-lg shadow-md text-center">
-          ✅ Votre réservation du <b>{start}</b> au <b>{end}</b> a bien été annulée.
+          ✅ Votre réservation du <b>{formatDateForEmail(start)}</b> au <b>{formatDateForEmail(end)}</b> a bien été annulée.
         </div>
       ) : (
         <div className="bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded-lg shadow-md text-center">

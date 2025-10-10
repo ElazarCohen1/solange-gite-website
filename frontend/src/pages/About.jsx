@@ -32,7 +32,7 @@ export default function About() {
       title: "Salle de bains",
       image: salle_bains,
       items: [
-        "Baignoire", "Douche", "Sèche-cheveux", "Serviettes", "Articles de toilette gratuits"
+        "3 salles de douches"," 1 salle de bain avec baignoire enfant","3 WC", "Sèche-cheveux", "Serviettes"
       ],
     },
     {
@@ -48,7 +48,7 @@ export default function About() {
       image: piscine,
       items: [
         "Terrasse", "Balcon", "Piscine privée", "Barbecue",
-        "Vue sur la piscine", "Vue sur le jardin", "Mobilier d’extérieur","table de ping pong"
+        "Vue sur la piscine", "Vue sur le jardin", "Mobilier de jardin","table de ping pong"
       ],
     },
     {

@@ -95,9 +95,7 @@ async function updateSheet(range, values) {
   }
 }
 
-
-app.post("/reserve", async (req, res) => {
-  const formatDateForEmail = (dateString) => {
+const formatDateForEmail = (dateString) => {
       const date = new Date(dateString);
       return date.toLocaleDateString('fr-FR', {
         weekday: 'long',
@@ -105,7 +103,10 @@ app.post("/reserve", async (req, res) => {
         month: 'long',
         day: 'numeric'
       });
-    };
+};
+
+app.post("/reserve", async (req, res) => {
+  
   try {
     
 
@@ -144,6 +145,7 @@ app.post("/reserve", async (req, res) => {
     }
     // envoyer un mail de confirmation au proprietaire et au client
     try{
+        const endPlusOne = new Date(end.getTime() + 24 * 60 * 60 * 1000);
         await sendEmail(
         email,
         "confirmation de réservation",
@@ -155,7 +157,7 @@ app.post("/reserve", async (req, res) => {
           <p>Bonjour <b>${nom}</b>,</p>
           <p>Votre réservation du <b>${startFormatted}</b> au <b>${endFormatted}</b> pour <b>${nb_personne} personnes</b> a été confirmée.</p>
           <p>Si vous souhaitez annuler votre réservation, cliquez sur le bouton ci-dessous :</p>
-          <a href="http://localhost:5173/cancel?start=${startDate}&end=${endDate}&email=${email}" 
+          <a href="http://localhost:5173/cancel?start=${startDate}&end=${endPlusOne}&email=${email}" 
             style="display:inline-block;padding:10px 20px;margin:10px 0;background:#d9534f;color:#fff;
                     text-decoration:none;border-radius:5px;font-weight:bold;">
             Annuler ma réservation
@@ -201,8 +203,10 @@ app.post("/cancel_reservation", async (req, res) => {
       const [date, prix, dispo, nom, mail] = row;
       const [day, month, year] = date.split("/");
       const rowDate = new Date(`${year}-${month}-${day}`);
+      const endPlusOne = new Date(end.getTime() + 24 * 60 * 60 * 1000);
 
-      if (rowDate >= start && rowDate <= end && mail === email) {
+
+      if (rowDate >= start && rowDate <= endPlusOne && mail === email) {
         // remettre dispo à "Oui" et vider les infos
         updates.push({
           range: `Feuil1!C${i + 1}:F${i + 1}`,
@@ -223,14 +227,14 @@ app.post("/cancel_reservation", async (req, res) => {
     await sendEmail(
       email,
       "Annulation de votre réservation",
-      `Bonjour,\n\nVotre réservation du ${startDate} au ${endDate} a bien été annulée.\n\nMerci.`
+      `Bonjour,\n\nVotre réservation du ${formatDateForEmail(startDate)} au ${formatDateForEmail(endDate)} a bien été annulée.\n\nMerci.`
     );
 
     // envoyer email au propriétaire
     await sendEmail(
       "elazarcohen01@gmail.com",
       "Réservation annulée",
-      `Le client ${email} a annulé sa réservation du ${startDate} au ${endDate}.`
+      `Le client ${email} a annulé sa réservation du ${formatDateForEmail(startDate)} au ${formatDateForEmail(endDate)}.`
     );
 
     res.json({ success: true, message: "Réservation annulée avec succès." });
