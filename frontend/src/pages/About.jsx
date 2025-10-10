@@ -96,19 +96,7 @@ export default function About() {
           />
         ))}
       </div>
-
-      {/* Footer */}
-      <div className="mt-16 text-center">
-        <p className="text-gray-600 mt-2">
-           une <span className="font-medium">taxe</span> de sejour est à payer au propriétaire 
-        </p>
-        <p className="text-gray-600">
-          Langues parlées : <span className="font-medium">Français, Anglais</span>
-        </p>
-        <p>
-          la villa est equipe d'une boite a clé 
-        </p>
-      </div>
+      
     </div>
   );
 }

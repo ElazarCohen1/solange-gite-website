@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useScrollSpy } from '../useScrollSpy'; // chemin vers ton hook
 
 function NavbarMenu() {
-  const sections = ['presentation', 'about', 'decouverte','contact']; 
+  const sections = ['presentation', 'about', 'decouverte','informations','contact']; 
   const active = useScrollSpy(sections, 80); 
 
   return (
@@ -39,7 +39,9 @@ function NavbarMenu() {
             >
               Decouverte
             </Nav.Link>
-
+            <Nav.Link href='#informations' className={active === 'informations'? 'text-primary fw-bold' : 'text-dark'}>
+              Informations
+            </Nav.Link>
             <Nav.Link 
               href="#contact" 
               className={active === 'contact' ? 'text-primary fw-bold' : 'text-dark'}

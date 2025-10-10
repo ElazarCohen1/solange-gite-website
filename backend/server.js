@@ -77,6 +77,18 @@ app.get("/price_and_date",async (req,res)=>{
     res.status(500).send("erreur lors de la récuperation des prix")
   }
 })
+
+app.get("/taxeSejour", async (req, res) => {
+  try {
+    const data = await getSheet("Feuil1!I2:I2");
+    console.log(data);
+    res.json({success: true, message: "taxeSejour", data: data[0][0]});
+
+    res.json(data);
+  } catch (err) {
+    res.status(500).send("Erreur serveur");
+  }
+});
  
 async function updateSheet(range, values) {
 

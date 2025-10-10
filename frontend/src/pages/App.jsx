@@ -1,17 +1,18 @@
 import '../css/App.css'
 import NavbarMenu from '../components/navBar.jsx'
 import Presentation from './Presentation.jsx'
-import About from '../pages/About'
-import Decouverte from '../pages/Decouverte.jsx'
-import Contact from '../pages/Contact.jsx'
+import About from './About.jsx'
+import Decouverte from './Decouverte.jsx'
+import Contact from './Contact.jsx'
 import MentionsLegales from './MentionsLegales.jsx'
 import ReservationSearchBar from "../components/reservation";
-import CancelReservation from "../pages/CancelReservation.jsx"; // 🔹 importer la nouvelle page
+import CancelReservation from "./CancelReservation.jsx"; // 🔹 importer la nouvelle page
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Informations from './Informations.jsx'
 
 // ta page actuelle (home) emballée dans un composant
 function Home() {
@@ -31,6 +32,9 @@ function Home() {
           </section>
           <section id='decouverte' className='section scroll-mt-4'>
             <Decouverte />
+          </section>
+          <section id="informations" className='section scroll-mt-10'>
+            <Informations />
           </section>
           <section id='contact' className='section'>
             <Contact />
