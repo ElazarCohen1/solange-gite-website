@@ -1,3 +1,4 @@
+import 'bootstrap/dist/css/bootstrap.min.css';
 import '../css/App.css'
 import NavbarMenu from '../components/navBar.jsx'
 import Presentation from './Presentation.jsx'
@@ -14,13 +15,10 @@ import "slick-carousel/slick/slick-theme.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Informations from './Informations.jsx'
 
-// ta page actuelle (home) emballée dans un composant
 function Home() {
   return (
     <>
-      <header>
-        <NavbarMenu />
-      </header>
+     
       <main>
         <div className='space-y-6'>
           <section id='presentation' className='section scroll-mt-10 mt-2'>
@@ -51,6 +49,9 @@ function Home() {
 function App() {
   return (
     <BrowserRouter>
+     <header>
+        <NavbarMenu />
+      </header>
       <Routes>
         {/* route principale */}
         <Route path="/" element={<Home />} />

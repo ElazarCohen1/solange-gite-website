@@ -83,8 +83,6 @@ app.get("/taxeSejour", async (req, res) => {
     const data = await getSheet("Feuil1!I2:I2");
     console.log(data);
     res.json({success: true, message: "taxeSejour", data: data[0][0]});
-
-    res.json(data);
   } catch (err) {
     res.status(500).send("Erreur serveur");
   }

@@ -1,17 +1,15 @@
 import { Navbar, Container, Nav } from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { useScrollSpy } from '../useScrollSpy'; // chemin vers ton hook
+import { useScrollSpy } from '../useScrollSpy'; 
 
 function NavbarMenu() {
   const sections = ['presentation', 'about', 'decouverte','informations','contact']; 
   const active = useScrollSpy(sections, 80); 
-
   return (
     <Navbar 
       expand="lg"  
       bg="light" 
-      variant='green'
-      className='fixed-top justify-content-end'
+      variant='light'
+      fixed='top'
     >
       <Container>
         {/* <Navbar.Brand href="#home" className="d-flex align-items-center gap-2">
