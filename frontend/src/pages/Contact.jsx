@@ -5,7 +5,7 @@ function Contact() {
   async function sendEmail(e) {
     e.preventDefault();
     console.log("Envoi du message...");
-    await fetch("https://solange-gite-website.vercel.app/send_contact_email", {
+    await fetch("https://solange-gite-website.onrender.com/send_contact_email", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
