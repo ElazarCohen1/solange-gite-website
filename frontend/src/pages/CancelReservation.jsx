@@ -24,7 +24,7 @@ export default function CancelReservation() {
   const handleCancel = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8080/cancel_reservation", {
+      const res = await fetch("https://solange-gite-website.vercel.app/cancel_reservation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ startDate: start, endDate: end, email }),

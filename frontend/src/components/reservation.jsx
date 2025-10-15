@@ -45,7 +45,7 @@ export default function ReservationSearchBar() {
 
   const get_disables_dates = async () => {
     try {
-      const url = new URL("http://localhost:8080/disable_dates");
+      const url = new URL("https://solange-gite-website.onrender.com//disable_dates");
       const response = await fetch(url);
       
       if (!response.ok) {
@@ -110,7 +110,7 @@ export default function ReservationSearchBar() {
     }
     try{
       setLoading(true);
-      const res = await fetch("http://localhost:8080/reserve", {
+      const res = await fetch("https://solange-gite-website.onrender.com//reserve", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body)
@@ -132,7 +132,7 @@ export default function ReservationSearchBar() {
 
 
   const fetch_price = () => {
-    fetch("http://localhost:8080/price_and_date")
+    fetch("https://solange-gite-website.onrender.com//price_and_date")
     .then((res) => {
       if (!res.ok) {
         return res.json().then((data) => {

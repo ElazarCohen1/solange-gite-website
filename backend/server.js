@@ -8,7 +8,13 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
-app.use(cors({ origin: "http://localhost:5173" }));
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+app.use(cors(corsOptions));
+
 app.use(express.json());
 // envoyer un mail a chaque reservation
 const transporter = nodemailer.createTransport({
@@ -340,7 +346,8 @@ app.post("/send_contact_email", async (req, res) => {
     
 });
 
+PORT = process.env.PORT || 8080
 
-app.listen(8080, () => {
-  console.log("server running on http://localhost:8080");
+app.listen(PORT, () => {
+  console.log("server running on "+ PORT);
 });	

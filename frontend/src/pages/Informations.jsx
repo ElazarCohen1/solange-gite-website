@@ -6,7 +6,7 @@ export default function Informations() {
 
   const  taxeSejour = async ()  =>{
     try {
-      const response = await fetch('http://localhost:8080/taxeSejour', {
+      const response = await fetch('https://solange-gite-website.vercel.app/taxeSejour', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
