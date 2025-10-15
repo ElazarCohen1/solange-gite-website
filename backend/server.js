@@ -3,6 +3,9 @@ import cors from "cors";
 import fs from "fs";
 import nodemailer from "nodemailer";
 import { google } from "googleapis";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
 app.use(cors({ origin: "http://localhost:5173" }));
@@ -11,17 +14,17 @@ app.use(express.json());
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "elazarcohen01@gmail.com",
-    pass: "syja hpir lopf pgbr"
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_PASS
   }
 });
 
-const spreadsheetId = "1SgcUEJcgRmkyRgWcg9BSW5xs_EIpENVr4DiN4FY-MkY";
+const spreadsheetId = process.env.SHEET_ID;
 
 async function sendEmail(to,subject,text="",html="") {
   try{
     await transporter.sendMail({
-      from: "elazarcohen01@gmail.com",
+      from: process.env.GMAIL_USER,
       to: to,
       subject: subject,
       text: text,
@@ -36,7 +39,7 @@ async function sendEmail(to,subject,text="",html="") {
 
 async function googlesheet() {
   const auth = new google.auth.GoogleAuth({
-    keyFile: "secrets.json",
+    keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS,
     scopes: "https://www.googleapis.com/auth/spreadsheets"
   });
 
@@ -160,7 +163,7 @@ app.post("/reserve", async (req, res) => {
         email,
         "confirmation de réservation",
         `Bonjour ${nom},\n\nVotre réservation du ${startFormatted} au ${endFormatted} pour ${nb_personne} personnes a été confirmée.
-        Si vous voulez annulez appuyer sur ce lien : http://localhost:8080/cancel_reservation 
+        Si vous voulez annulez appuyer sur ce lien : http://localhost:5173/cancel?start=${startDate}&end=${endPlusOne}&email=${email}
         \n\nMerci!`,
         `
         <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
@@ -177,6 +180,39 @@ app.post("/reserve", async (req, res) => {
           <p>Merci et à bientôt !</p>
         </div>
         `
+        );
+        await sendEmail(
+          process.env.GMAIL_USER,
+          "Nouvelle réservation",
+          ``,
+          `
+          <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333; line-height: 1.5; max-width: 600px; margin: auto; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; background-color: #f9f9f9;">
+            <h2 style="color: #2c3e50; text-align: center;">Nouvelle réservation !</h2>
+            <p>Bonjour,</p>
+            <p>Vous avez reçu une nouvelle réservation. Voici les détails :</p>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+              <tr>
+                <td style="padding: 8px; font-weight: bold;">Nom :</td>
+                <td style="padding: 8px;">${nom}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; font-weight: bold;">Email :</td>
+                <td style="padding: 8px;">${email}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; font-weight: bold;">Dates :</td>
+                <td style="padding: 8px;">Du <b>${startFormatted}</b> au <b>${endFormatted}</b></td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; font-weight: bold;">Nombre de personnes :</td>
+                <td style="padding: 8px;">${nb_personne}</td>
+              </tr>
+            </table>
+            <p style="text-align: center; margin-top: 30px; color: #888; font-size: 14px;">
+              Ceci est un email automatique, merci de ne pas y répondre.
+            </p>
+          </div>
+          `
         );
     }catch(err){
       console.error("Erreur lors de l'envoi de l'email au client :", err);
@@ -244,7 +280,7 @@ app.post("/cancel_reservation", async (req, res) => {
 
     // envoyer email au propriétaire
     await sendEmail(
-      "elazarcohen01@gmail.com",
+      process.env.GMAIL_USER,
       "Réservation annulée",
       `Le client ${email} a annulé sa réservation du ${formatDateForEmail(startDate)} au ${formatDateForEmail(endDate)}.`
     );
@@ -282,7 +318,7 @@ app.post("/send_contact_email", async (req, res) => {
 
   try{
     await sendEmail(
-    "elazarcohen01@gmail.com",
+    process.env.GMAIL_USER,
     "Nouveau message de contact",
     `Vous avez reçu un nouveau message de ${nom} (${email}) :\n\n"${message}"`
     ,
