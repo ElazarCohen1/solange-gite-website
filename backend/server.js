@@ -19,8 +19,8 @@ app.use(express.json());
 // envoyer un mail a chaque reservation
 const transporter = nodemailer.createTransport({
   service: "gmail",
-  port:587,
-  secure:false,
+  port:465,
+  secure:true,
   auth: {
     user: process.env.GMAIL_USER,
     pass: process.env.GMAIL_PASS
