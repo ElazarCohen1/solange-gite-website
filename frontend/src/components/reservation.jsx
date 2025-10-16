@@ -177,135 +177,136 @@ export default function ReservationSearchBar() {
   const prettyDate = (d) => format(d, "dd/M/yyyy");
 
   return (
-    <div className="w-full flex justify-center p-8">
-      <div className="w-[90%] bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-8 flex flex-col md:flex-row gap-8 items-center border border-slate-100">
+  <div className="w-full flex justify-center px-4 py-6 sm:p-8">
+    <div className="w-full sm:w-[90%] bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-4 sm:p-8 flex flex-col md:flex-row gap-6 sm:gap-8 items-center border border-slate-100">
 
-        {/* Left: Dates */}
-        <div className="flex-1 w-full relative ">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-xl font-semibold">Réservez votre séjour</h3>
-              <p className="text-sm text-slate-500 mt-1">
-                Sélectionnez vos dates et le nombre de voyageurs
-              </p>
-            </div>
-
-            <div className="flex flex-col items-stretch gap-6">
-              <button
-                onClick={() => setOpenCalendar((s) => !s)}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-300 text-sm hover:bg-slate-50 active:scale-95 transition"
-              >
-                {openCalendar ? "Fermer le calendrier" : "Modifier les dates"}
-              </button>
-              {/* le mail */}
-              <input
-                name="mail_reservation"
-                type="text"
-                placeholder="Rentrez votre mail"
-                onChange={(e)=> setMail(e.target.value)}
-                required
-                className="px-4 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-              />
-            </div>
- 
-          </div>
-
-          {/* Dates résumées */}
-          <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-6 bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm">
-            <div>
-              <p className="text-xs text-slate-400">Arrivée(exlus)</p>
-              <p className="text-base font-medium">{prettyDate(range[0].startDate)}</p>
-            </div>
-            <div>
-              <p className="text-xs text-slate-400">Départ(inclus)</p>
-              <p className="text-base font-medium">{prettyDate(range[0].endDate)}</p>
-            </div>
-            <div>
-              <p className="text-xs text-slate-400">Prix par nuit </p>
-              <p className="text-base font-semibold text-sky-600">{priceByNight()} €</p>
-            </div>
-            <div>
-              <p className="text-xs text-slate-400">Prix total</p>
-                <p className="text-base font-semibold text-indigo-600">{priceTotal}€</p>
-            </div>
-          </div>
-
-          {/* Calendar overlay */}
-          {openCalendar && (
-            <div className="absolute top-full left-0 mt-2 bg-white p-4 rounded-xl border border-slate-200 shadow-lg z-50 transition-all duration-300 ease-in-out">
-              <DateRange
-                onChange={(item) => setRange([item.selection])}
-                moveRangeOnFirstSelection={false}
-                ranges={range}
-                months={2}
-                direction="horizontal"
-                minDate={new Date()}
-                disabledDates={disabledDates}
-                dayContentRenderer={(date)=>{
-                  const day = date.getDate();
-                  const month = date.getMonth() + 1; 
-                  const year = date.getFullYear();
-                  const key = `${day}/${month}/${year}`;
-                  const prixParJour = allPrices[key] || "—";
-
-                  return(
-                    <div className="flex flex-col items-center justify-center h-full p-1">
-                      <span className="text-sm font-medium block leading-tight">
-                        {date.getDate()}
-                      </span> 
-                      <span className="text-[8px] text-gray-600 block leading-tight mt-1">
-                        {prixParJour}
-                      </span>
-                    </div>
-                  )
-                }}
-              />
-            </div>
-          )}
-        </div>
-
-        {/* Right: Guests & CTA */}
-        <div className="w-full md:w-80 flex-shrink-0">
-          <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-6">
-            <div>
-              <label className="text-xs text-slate-500">Voyageurs</label>
-              <div className="mt-2 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => setGuests((g) => Math.max(1, g - 1))}
-                    className="h-8 w-8 rounded-full border flex items-center justify-center text-lg"
-                  >
-                    −
-                  </button>
-                  <div className="min-w-[48px] text-center font-medium text-lg">{guests}</div>
-                  <button
-                    onClick={() => setGuests((g) => Math.min(12, g + 1))}
-                    className="h-8 w-8 rounded-full border flex items-center justify-center text-lg"
-                  >
-                    +
-                  </button>
-                </div>
-                <div className="text-xs text-slate-400">max 12</div>
-              </div>
-            </div>
-
-            <button
-              onClick={handleReserve}
-              className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 text-white font-semibold shadow-md hover:scale-[1.01] transition-transform"
-            >
-              {!loading ? ( 
-                  <span>Réserver</span>
-
-              ): <span>⏳ Reservation en cours...</span>
-              }
-            </button>
-
-            <p className="text-center text-xs text-slate-500">
-              Confirmation instantanée selon disponibilité
+      {/* Left: Dates */}
+      <div className="flex-1 w-full relative">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
+          <div>
+            <h3 className="text-lg sm:text-xl font-semibold text-center sm:text-left">
+              Réservez votre séjour
+            </h3>
+            <p className="text-sm text-slate-500 mt-1 text-center sm:text-left">
+              Sélectionnez vos dates et le nombre de voyageurs
             </p>
           </div>
+
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-6">
+            <button
+              onClick={() => setOpenCalendar((s) => !s)}
+              className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-lg border border-slate-300 text-sm hover:bg-slate-50 active:scale-95 transition text-center"
+            >
+              {openCalendar ? "Fermer le calendrier" : "Modifier les dates"}
+            </button>
+
+            {/* Champ mail */}
+            <input
+              name="mail_reservation"
+              type="email"
+              placeholder="Votre mail"
+              onChange={(e) => setMail(e.target.value)}
+              required
+              className="px-3 sm:px-4 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition w-full sm:w-auto"
+            />
+          </div>
+        </div>
+
+        {/* Dates résumées */}
+        <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 bg-slate-50 p-3 sm:p-4 rounded-xl border border-slate-200 shadow-sm text-center sm:text-left">
+          <div>
+            <p className="text-xs text-slate-400">Arrivée (excl.)</p>
+            <p className="text-base font-medium">{prettyDate(range[0].startDate)}</p>
+          </div>
+          <div>
+            <p className="text-xs text-slate-400">Départ (incl.)</p>
+            <p className="text-base font-medium">{prettyDate(range[0].endDate)}</p>
+          </div>
+          <div>
+            <p className="text-xs text-slate-400">Prix / nuit</p>
+            <p className="text-base font-semibold text-sky-600">{priceByNight()} €</p>
+          </div>
+          <div>
+            <p className="text-xs text-slate-400">Prix total</p>
+            <p className="text-base font-semibold text-indigo-600">{priceTotal} €</p>
+          </div>
+        </div>
+
+        {/* Calendrier */}
+        {openCalendar && (
+          <div className="absolute top-full left-0 mt-2 bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-lg z-50 transition-all duration-300 ease-in-out">
+            <DateRange
+              onChange={(item) => setRange([item.selection])}
+              moveRangeOnFirstSelection={false}
+              ranges={range}
+              months={window.innerWidth < 640 ? 1 : 2} // ✅ 1 mois sur mobile
+              direction={window.innerWidth < 640 ? "vertical" : "horizontal"}
+              minDate={new Date()}
+              disabledDates={disabledDates}
+              dayContentRenderer={(date) => {
+                const day = date.getDate();
+                const month = date.getMonth() + 1;
+                const year = date.getFullYear();
+                const key = `${day}/${month}/${year}`;
+                const prixParJour = allPrices[key] || "—";
+
+                return (
+                  <div className="flex flex-col items-center justify-center h-full p-1">
+                    <span className="text-sm font-medium block leading-tight">{day}</span>
+                    <span className="text-[8px] text-gray-600 block leading-tight mt-1">
+                      {prixParJour}
+                    </span>
+                  </div>
+                );
+              }}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Right: Guests & CTA */}
+      <div className="w-full md:w-80 flex-shrink-0">
+        <div className="bg-slate-50 p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-4 sm:gap-6">
+          <div>
+            <label className="text-xs text-slate-500">Voyageurs</label>
+            <div className="mt-2 flex items-center justify-between">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <button
+                  onClick={() => setGuests((g) => Math.max(1, g - 1))}
+                  className="h-8 w-8 rounded-full border flex items-center justify-center text-lg active:scale-90"
+                >
+                  −
+                </button>
+                <div className="min-w-[48px] text-center font-medium text-lg">{guests}</div>
+                <button
+                  onClick={() => setGuests((g) => Math.min(12, g + 1))}
+                  className="h-8 w-8 rounded-full border flex items-center justify-center text-lg active:scale-90"
+                >
+                  +
+                </button>
+              </div>
+              <div className="text-xs text-slate-400">max 12</div>
+            </div>
+          </div>
+
+          <button
+            onClick={handleReserve}
+            className="w-full inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-3 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 text-white font-semibold shadow-md hover:scale-[1.02] active:scale-[0.98] transition-transform text-sm sm:text-base"
+          >
+            {!loading ? (
+              <span>Réserver</span>
+            ) : (
+              <span>⏳ Réservation en cours...</span>
+            )}
+          </button>
+
+          <p className="text-center text-xs text-slate-500">
+            Confirmation instantanée selon disponibilité
+          </p>
         </div>
       </div>
     </div>
-  );
+  </div>
+);
+
 }
