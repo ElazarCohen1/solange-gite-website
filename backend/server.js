@@ -19,6 +19,8 @@ app.use(express.json());
 // envoyer un mail a chaque reservation
 const transporter = nodemailer.createTransport({
   service: "gmail",
+  port:587,
+  secure:false,
   auth: {
     user: process.env.GMAIL_USER,
     pass: process.env.GMAIL_PASS
@@ -128,8 +130,6 @@ const formatDateForEmail = (dateString) => {
 app.post("/reserve", async (req, res) => {
   
   try {
-    
-
     const { startDate, endDate, nom, email,nb_personne } = req.body;
     // récupération de la feuille
     const rows = await getSheet("Feuil1!A:F"); // A=Date, B=Prix, C=Dispo, D=Nom, E=Email F=nb_personne
@@ -170,7 +170,7 @@ app.post("/reserve", async (req, res) => {
         email,
         "confirmation de réservation",
         `Bonjour ${nom},\n\nVotre réservation du ${startFormatted} au ${endFormatted} pour ${nb_personne} personnes a été confirmée.
-        Si vous voulez annulez appuyer sur ce lien : http://localhost:5173/cancel?start=${startDate}&end=${endPlusOne}&email=${email}
+        Si vous voulez annulez appuyer sur ce lien : ${process.env.CORS_ORIGIN}/cancel?start=${startDate}&end=${endPlusOne}&email=${email}
         \n\nMerci!`,
         `
         <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
@@ -179,7 +179,7 @@ app.post("/reserve", async (req, res) => {
           <p> <b>Rappel : <b/> la taxe de sejour par personne sera a payer au propriétaire (Voir les informations sur le site)<p/>
 
           <p>Si vous souhaitez annuler votre réservation, cliquez sur le bouton ci-dessous :</p>
-          <a href="http://localhost:5173/cancel?start=${startDate}&end=${endPlusOne}&email=${email}" 
+          <a href="${process.env.CORS_ORIGIN}/cancel?start=${startDate}&end=${endPlusOne}&email=${email}" 
             style="display:inline-block;padding:10px 20px;margin:10px 0;background:#d9534f;color:#fff;
                     text-decoration:none;border-radius:5px;font-weight:bold;">
             Annuler ma réservation
