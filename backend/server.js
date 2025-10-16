@@ -46,7 +46,7 @@ async function sendEmail(to,subject,text="",html="") {
 async function googlesheet() {
   const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS);
   const auth = new google.auth.GoogleAuth({
-    keyFile: credentials,
+    credentials: credentials,
     scopes: "https://www.googleapis.com/auth/spreadsheets"
   });
 
@@ -352,3 +352,4 @@ const PORT = process.env.PORT || 8080
 app.listen(PORT, () => {
   console.log("server running on "+ PORT);
 });	
+
